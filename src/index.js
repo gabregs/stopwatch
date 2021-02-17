@@ -1,17 +1,72 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+class StopWatch extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      timePassedInMilliSeconds: 0,
+    };
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+    this.timer = null;
+
+    this.start = this.start.bind(this);
+    this.stop = this.stop.bind(this);
+    this.reset = this.reset.bind(this);
+  }
+
+  start() {
+    if (!this.timer) {
+      let startTime = Date.now();
+      this.timer = setInterval(() => {
+        const stopTime = Date.now();
+        const timePassedInMilliSeconds =
+          stopTime - startTime + this.state.timePassedInMilliSeconds;
+
+        this.setState({
+          timePassedInMilliSeconds,
+        });
+
+        startTime = stopTime;
+      }, 250);
+    }
+  }
+
+  stop() {
+    window.clearInterval(this.timer);
+    this.timer = null;
+  }
+
+  reset() {
+    this.stop();
+    this.setState({
+      timePassedInMilliSeconds: 0,
+    });
+  }
+
+  render() {
+    return (
+      <div>
+        <h2
+          className="border px-3 py-4 rounded my-3 mx-auto text-center"
+          style={{ maxWidth: '300px' }}
+        >
+          {Math.floor(this.state.timePassedInMilliSeconds / 1000)} s
+        </h2>
+        <div className="d-flex justify-content-center">
+          <button className="btn btn-primary me-2" onClick={this.start}>
+            start
+          </button>
+          <button className="btn btn-danger me-2" onClick={this.stop}>
+            stop
+          </button>
+          <button className="btn btn-warning" onClick={this.reset}>
+            reset
+          </button>
+        </div>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<StopWatch />, document.getElementById('root'));
